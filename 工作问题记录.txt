@@ -1,0 +1,409 @@
+1、当在window上编辑的脚本文件用于linux上面部署时可能会出现 “common.sh:行3: $'\r': 未找到命令“ 或者 
+   执行过程中出现/bin/bash^M: 坏的解释器：没有那个文件或目录错误，无法正常运行。这类的问题都是因为
+   两种环境下换行的表示有问题（windows为/n/r， linux为/n）导致的。
+
+解决方案：安装dos2unix工具  yum install dos2unix。然后用dos2unix common.sh即可，再运行是就不会再报错
+
+
+2、pcap文件详解
+	解决方案：参考文章见https://blog.csdn.net/ytx2014214081/article/details/80112277
+
+3、查看系统版本   
+	cat /etc/redhat-release
+
+
+4、yum源有问题的解决办法
+	yum clean all
+	yum makecache
+	yum -y update
+
+
+5、pika的学习
+
+6、kafka的学习
+
+7、grpc的学习
+
+8、防火墙操作
+	a:查看防火状态
+	systemctl status firewalld
+	service  iptables status
+
+	b:暂时关闭防火墙
+	systemctl stop firewalld
+	service  iptables stop
+
+	c:永久关闭防火墙
+	systemctl disable firewalld
+	chkconfig iptables off
+
+	d:重启防火墙
+	systemctl enable firewalld
+	service iptables restart  
+
+9、当用pip install 安装python包的时候可能会报raise ReadTimeoutError错误
+	设置默认超时时间或者更改pip的源都可以  pip --default-timeout=100 install -U  包名（如：elasticsearch）
+
+10、mongodb远程连接
+	 mongo 134.567.345.23:27017/admin -uusername -p
+
+11、利用豆瓣源安装python模块包提高安装速率
+	 pip3  install  -i  https://pypi.doubanio.com/simple/  --trusted-host pypi.doubanio.com 模块名
+	sudo pip3 install -i https://pypi.douban.com/simple/ pymysql 
+
+12、pcap包的回访
+	生成pcap包：tcpdump -X -i eno16777736 -s 0 -w /home/test.pcap
+	回访pcap包：tcpreplay -i eno16777736 -r 1000 -l 0 /home/test.pcap
+	回放pcap包：tcpreplay -v  -i enp2s0 -M 1000 b05ca4675bf8054f24a4bdd4c1f7721c-1583898158.pcap
+	./suricata -r /home/ms-sql-tds.pcapng -c /usr/local/etc/suricata/suricata.yaml -k none -l /home/IDS_TH_NETFLOW_DETECT/log/suricata/
+
+13、git的使用
+	git log 查看提交日志
+	git log --pretty=online  查看提交日志简略信息
+	git reset --hard commitd_id_head  回退到指定commitd_id
+	git reflog 查看git所有操作记录
+	git branch 查看当前分支
+	git branch -a 查看本地和远程分支
+	git branch -r 查看远程分支
+	git merge dev  先切换到master分支，执行此命令，合并dev分支代码到master分支
+	git checkout -b zhanghanlun origin/zhanghanlun  切换远程分支并新建本地分支
+	git diff 文件名 查看文件改动的地方，不加文件名为查看全部
+	git branch dev  新建一个dev分支
+	git checkout dev 切换到dev分支
+	git checkout -b dev  新建并切换到dev分支
+	git tag  查看打的版本号标签
+	git tag tagname 新建一个版本号标签，名称是tagname
+	git tag origin <tagName> //推送到远程仓库
+	git push origin --tags 推送所用标签到远程仓库
+	git tag -a <tagName> <commitId> 对指定commit_id新建一个版本标签
+	git push origin --delete 远程分支名    //删除远程分支
+	设置ssh：$ ssh-keygen -t rsa；拷贝 c/Users/HP/.ssh/id_rsa.pub.里面的内容到gitlab SSH Keys；复制到gitlab设置里面的SSHkeys里面并添加
+	git clone 地址
+	将远程指定分支 拉取到 本地指定分支上：git pull origin <远程分支名>:<本地分支名>
+	修改后git add . 后git commit -m"保存的信息"
+	将本地当前分支 推送到 远程指定分支上：git push origin <本地分支名>:<远程分支名>
+	git pull origin master --allow-unrelated-histories 允许不同的历史版本拉取合并到仓库。
+
+14、python2改为python3直接执行这两个命令即可：
+
+	sudo update-alternatives --install /usr/bin/python python /usr/bin/python2 100
+	sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 150
+
+	如果要切换到Python2，执行：
+
+	sudo update-alternatives --config python
+15、uwsgi软连接的使用
+	ln -s python3uwsgi地址  /usr/bin/uwsgi
+
+16、查看磁盘利用情况
+	df -l
+
+17、查看开了哪些端口
+	netstat -tlnp
+
+18、获取url的信息
+	curl localhost:9200
+
+19、将pip的源换成国内的
+	linux版：
+	1.cd ~ 进入用户目录
+	2.mkdir .pip  建立隐藏文件.pip 可以用ls -a 查看
+	3.cd .pip 进入.pip文件夹
+	4.touch pip.conf  新建pip.conf文件
+	5.vi pip.conf  编辑配置文件
+	 	文件内容如下：[global]
+			       index-url = https://pypi.tuna.tsinghua.edu.cn/simple
+			       [install]
+			       trusted-host = pypi.tuna.tsinghua.edu.cn
+		国内还有一下的源：
+			       阿里云 http://mirrors.aliyun.com/pypi/simple/ 
+ 			       中国科技大学 https://pypi.mirrors.ustc.edu.cn/simple/ 
+      			       豆瓣(douban) http://pypi.douban.com/simple/ 
+  			       清华大学 https://pypi.tuna.tsinghua.edu.cn/simple/ 
+  	                                       中国科学技术大学 http://pypi.mirrors.ustc.edu.cn/simple/
+	注：不会vi编辑命令自行百度
+
+	windows版：
+	1.双击我的电脑，在最上面的的文件夹窗口输入 ： %APPDATA%，然后回车进入目录
+	2.新建文件夹pip
+	3.新建文件pip.ini
+	4.双击打开，写入一下内容（源可以换，同上国内源）：
+		[global]
+		timeout = 6000
+		index-url = https://pypi.tuna.tsinghua.edu.cn/simple
+		trusted-host = pypi.tuna.tsinghua.edu.cn
+	5.保存退出
+
+
+
+20、虚拟机linux系统中按下Ctrl + Alt + F3可以切换到无图形界面，Ctrl + Alt + F1可以切换到图形界面
+
+
+21、pycharm整个项目中搜索Ctrl + Shift + F 在项目目录中查找指定文件使用Ctrl + Shift + N
+
+22、a = a+b  和 += 的区别，+=是追加操作，+ 是相当于重生成了一个变量， 所有字符串相加时+=更快
+       列表相加时+=相当于extend是在原基础之上添加，而+的话相当于重新生成，相当于深拷贝
+       如：>>> a = [1,2,3]
+              >>> b = a
+              >>> a = a + [4,5,6] 
+       结果：>>> a
+	[1, 2, 3, 4, 5, 6]
+	>>> b
+	[1, 2, 3] 
+       如：>>> a = [1,2,3]
+              >>> b = a
+              >>> a += [4,5,6]
+       结果：>>> a
+	[1, 2, 3, 4, 5, 6]
+	>>> b
+	[1, 2, 3, 4, 5, 6]
+
+23、常用端口：9000 kafka_manager的端口， 9001是supervisor的端口，9100是elasticsearch-head的端口，5601是kibana的端口
+
+
+24、关于elasticsearch使用G1垃圾回收替换CMS
+	 修改jvm.options文件，将下面几行:
+		-XX:+UseConcMarkSweepGC
+		-XX:CMSInitiatingOccupancyFraction=75
+		-XX:+UseCMSInitiatingOccupancyOnly
+	更改为：
+		-XX:+UseG1GC
+		-XX:MaxGCPauseMillis=50  //默认是200
+
+25、磁盘基本操作命令
+	df -h  查询各个磁盘的情况 
+	df -h /usr/
+	du --max-depth=1 -h /home/  查询home目录下各文件的磁盘使用情况。
+	du -sh /usr/ 计算文件夹大小	
+
+26、永久配置IP
+	修改配置文件在：/etc/sysconfig/network-script/具体网卡配置文件，最主要的是下方配置的最后五行。
+	TYPE=Ethernet
+	DEFROUTE=yes
+	IPV4_FAILURE_FATAL=no
+	IPV6INIT=no
+	HWADDR=00:01:2E:78:C7:41
+	IPV6_AUTOCONF=yes
+	IPV6_DEFROUTE=yes
+	IPV6_FAILURE_FATAL=no
+	IPV6_ADDR_GEN_MODE=stable-privacy
+	NAME=enp0s31f6
+	UUID=4d2d66bd-9783-445e-b2d0-a2af5d6e15d1
+	DEVICE=enp0s31f6
+	ONBOOT=yes	
+	PREFIX=24
+	IPV6_PEERDNS=yes
+	IPV6_PEERROUTES=yes
+	ZONE=public
+	GATEWAY=172.31.50.1
+	NETMASK=255.255.255.0
+	IPADDR=172.31.50.225
+	BOOTPROTO=static
+	DNS1=114.114.114.114
+	
+	重启：service network restart
+27、linux远程连接
+	linux安装ssh
+	查看ssh是否安装
+		rpm -qa | grep ssh
+		注：若没安装SSH则可输入： yum install openssh-server安装。
+	启动SSH服务。
+　　		输入命令：service sshd restart重启SSH服务。
+　　		命令：service sshd start
+　　		启动服务 | 命令：service sshd stop停止服务
+　　		重启后可输入：netstat -antp | grep sshd查看是否启动22端口（可略）。
+	如何设置SSH服务为开机启动？
+　　		输入命令：chkconfig sshd on即可。
+　　		注：若是chkconfig sshd off则禁止SSH开机启动。
+
+	ssh root@172.31.50.225如果有Host key verification failed错误，先ssh-keygen -R 172.31.50.225一下
+	远程复制文件：#scp /home/administrator/news.txt root@192.168.6.129:/etc/squid  本地文件copy到远程主机
+		      #scp remote@www.abc.com:/usr/local/sin.sh /home/administrator  远程主机copy到本地文件
+
+28、修改linux账户密码：进入修改用户下，用password 用户名，然后会提示输入新密码两次。
+
+29、获取pycharm激活码网址：http://www.ifdll.com/pycharm/
+
+30、ldd命令回去运行文件依赖
+
+31、复制文件
+	scp root@172.31.50.225：/home/   想要的文件夹
+
+32、修改linux账户密码：进入修改用户下，用password 用户名，然后会提示输入新密码两次。
+
+33、查看已经安装的rpm包 yum list installed | grep docker
+
+33、查看cpu型号 cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c
+
+34、当es只可以读时：
+	PUT /twitter/_settings
+		{
+			"index.blocks.read_only_allow_delete": null
+		}
+35、时区修改
+	一、查看和修改linux的时区
+	1、查看当前时区
+	命令: date -R  设置时间的命令：date -s "2020-04-03 14:04:00"
+	clock --show或hwclock --show查看服务器时间
+	2、修改设置linux服务器时区
+	方法A
+	命令："tzselect"  备注：直接回车按指示进行
+	方法B 仅限于RedHat linux 和 centos
+	命令："timeconfig"
+	3、复制相应的时区文件，替换系统时区文件；或者创建链接文件
+	cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+
+36、添加环境变量
+	查看环境变量：echo $PATH
+ 	vi /etc/profile
+	最后一行添加：export PATH=$PATH:/usr/local/bin
+	然后source /etc/profile
+	可能出现的问题：我这里在/etc/profile下配置好环境变量后，每次关闭shell窗口后都需要再执行一次source /etc/profile才能生效，
+		          这个问题需要在~/.bashrc文件最后添加source /etc/profile，这样问题便得到解决。
+
+37、python虚拟环境配置使用
+	windows：
+		1、pip3 install virtualenv
+		2、pip3 install virtualenvwrapper-win
+		3、配置电脑系统环境变量-用户变量，->新建系统变量 -> 变量名：WORKON_HOME ->指定路径：D:\codeworkpace\python\envs
+		4、新建虚拟环境：mkvirtualenv [虚拟环境名称]
+		5、列出虚拟环境列表：workon
+		6、启动/切换虚拟环境：workon [虚拟环境名称]
+		7、离开虚拟环境：deactivate
+		进入环境后可以利用pip install 安装python包
+
+
+	linux：
+		1、yum install python-virtualenv
+		2、pip3 install virtualenv
+		3、pip3 install virtualenvwrapper
+		4、cd ~
+		5、vim .bashrc
+		6、添加：export WORKON_HOME=/home/python/virtualenvs (绝对路径)
+		7、添加：source /usr/bin/virtualenvwrapper.sh     注释：如不知道此文件位置可用find / -name virtualenvwrapper.sh查找
+		8、source .bashrc
+		9、mkvirtualenv venvname ----venvname代表虚拟环境名称；
+		10、mkvirtualenv -p pythonexepath venvname 如果电脑上安装有多个python版本，创建指定python版本的虚拟环境
+		11、列出虚拟环境列表：workon
+		12、启动/切换虚拟环境：workon [虚拟环境名称]
+		13、离开虚拟环境：deactivate
+		14、rmvirtualenv [venvname] 删除虚拟环境
+		进入环境后可以利用pip install 安装python包  要想使用以虚拟环境运行项目直接在虚拟环境下的bin目录下用python运行就可以了
+
+38、uwsgi --python-v 查看uwsgi对应的python版本
+
+39、rpm下载网站
+	http://rpmfind.net/
+	http://rpm.pbone.net/
+	
+
+40、https本地证书生成和配置
+
+	Linux系统下生成证书
+		1、生成秘钥key,运行:
+			$ openssl genrsa -des3 -out server.key 2048
+			会有两次要求输入密码,输入同一个即可
+			输入密码
+			然后你就获得了一个server.key文件. 
+			以后使用此文件(通过openssl提供的命令或API)可能经常回要求输入密码,如果想去除输入密码的步骤可以使用以下命令:
+			$ openssl rsa -in server.key -out server.key
+			创建服务器证书的申请文件server.csr,运行:
+			openssl req -new -key server.key -out server.csr
+			其中Country Name填CN,Common Name填主机名也可以不填,如果不填浏览器会认为不安全.(例如你以后的url为https://abcd/xxxx….这里就可以填abcd),其他的都可以不填. 
+			创建CA证书:
+			openssl req -new -x509 -key server.key -out ca.crt -days 3650
+			此时,你可以得到一个ca.crt的证书,这个证书用来给自己的证书签名. 
+			创建自当前日期起有效期为期十年的服务器证书server.crt：
+			openssl x509 -req -days 3650 -in server.csr -CA ca.crt -CAkey server.key -CAcreateserial -out server.crt
+			ls你的文件夹,可以看到一共生成了5个文件:
+			ca.crt   ca.srl    server.crt   server.csr   server.key
+			其中,server.crt和server.key就是你的nginx需要的证书文件. 
+	如何配置nginx
+		打开你的nginx配置文件,搜索443找到https的配置,去掉这段代码的注释.或者直接复制我下面的这段配置:
+		server {
+		listen 443;
+		server_name localhost;
+		ssl on;
+		ssl_certificate /root/Lee/keys/server.crt;#配置证书位置
+		ssl_certificate_key /root/Lee/keys/server.key;#配置秘钥位置
+		#ssl_client_certificate ca.crt;#双向认证
+		#ssl_verify_client on; #双向认证
+		ssl_session_timeout 5m;
+		ssl_protocols SSLv2 SSLv3 TLSv1;
+		ssl_ciphers ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP;
+		ssl_prefer_server_ciphers on;
+		将ssl_certificate改为server.crt的路径,将ssl_certificate_key改为server.key的路径. 
+		nginx -s reload 重载配置 
+		至此,nginx的https就可以使用了,默认443端口.
+
+		如果出现报错信息：
+		nginx: [emerg] BIO_new_file("/user/local/nginx/temp/server.crt") failed (SSL: error:02001002:system library:fopen:
+		No such file or directory:fopen('/user/local/nginx/temp/server.crt','r') error:2006D080:BIO routines:BIO_new_file:no such file)
+		把server.crt 和server.key 文件放在nginx/conf文件夹下。(和nginx.conf文件同一文件夹)
+		ssl_certificate  server.crt;
+		ssl_certificate_key  server.key;
+
+41、下载所有docker依赖
+	yum install --downloadonly --downloaddir=/root/docker docker
+
+
+42、设置国内时区步骤：
+	1、timedatectl set-timezone "Asia/Shanghai"
+	2、hwclock -w
+
+43、docker记录
+	1、 需要docker环境，例如yum install docker，docker是一个服务通过systemctl控制
+	2、 最好修改docker的存储位置，不然可能会把系统区占满，方法：
+	停止docker，添加配置文件/etc/docker/daemon.json（可能不存在），将文件复制到新位置，配置和命令如下：
+	{
+	    "graph": "/home/data/docker"
+	}
+
+	/bin/cp -r /var/lib/docker/* /home/data/docker/
+
+	2. 导入制作好的镜像，命令docker load -i moloch.tar
+	镜像在25上的/home/ccr/docker_moloch/moloch.tar
+
+	3. 通过镜像创建容器命令，监听端口自定义，如端口em4，创建后会自动启动
+	docker run -d --privileged --name moloch_server --network host --env INTERFACE=em4 moloch:v1.0
+	启动和关闭容器
+	docker stop 镜像id
+	docker start 镜像id
+	docker rm 镜像id
+	查看容器
+	docker ps -a
+
+	4. 启动之后就开始缓存流量了，接下来是启动python程序和API进行交互，配置合并到supervisor的配置里面了
+	5、查看某个容器的详细信息 docker inspect 3646dab192ee | more
+	注意：docker容器设置 docker重启时容器也可以自动启动
+		1、可以在容器run的时候加参数 --restart=always
+		2、如果容器已经在运行了，那怎么加这个参数呢
+		3、docker container update --restart=always 容器名字
+ 		4、systemctl restart docker 重启测试一下
+
+
+44、方法一:downloadonly
+	1.yum自动下载RPM包及其所有依赖的包至/root/rpm目录：
+　　　　
+	yum install yum-plugin-downloadonly　　
+ 
+	yum install --downloadonly --downloaddir=/root/rpm <package-name>
+
+	rpm -Uvh --force --nodeps *rpm
+
+45、kafka删除topic
+	sh kafka-topics.sh --zookeeper 10.66.xxx.xx:2181 --delete --topic TOPIC_1
+	
+46、iptables临时开启某端口号
+	iptables -I INPUT -p tcp --dport 5601 -j ACCEPT
+iptables -I FORWARD -i ens2f0 -p tcp -m tcp --dport 8080 -j DROP
+
+47、查询缺少文件或.so文件所在的依赖包
+	先确认安装yum-utils包（yum list installed yum-utils），没有安装通过yum -y install yum-utils安装
+	用 yum whatprovides 缺少的.so文件   如：（yum whatprovides libgcc_s.so.1）
+
+48、防火墙端口开启设置
+	firewall-cmd --zone=public --add-port=9001/tcp --permanent
+	firewall-cmd --reload
+
+

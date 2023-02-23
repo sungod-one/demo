@@ -1,0 +1,170 @@
+db.dropDatabase()  删除库
+
+db.collectionname.drop()  删除集合
+
+db.createCollection(name, option) option:可选参数，指定有关内存大小和索引的选项
+	 db.createCollection("mycol", { capped : true, autoIndexId : true, size : 6142800, max : 10000 } )
+	capped：（可选）如果为 true，则创建固定集合。固定集合是指有着固定大小的集合，当达到最大值时，它会自动覆盖最早的文档。
+	              当该值为 true 时，必须指定 size 参数。
+	autoindexId（可选）如为 true，自动在 _id 字段创建索引。默认为 false。
+	size：（可选）为固定集合指定一个最大值，以千字节计（KB）。如果 capped 为 true，也需要指定该字段。
+	max：（可选）指定固定集合中包含文档的最大数量。
+
+db.Collectionname.isCapped()  判断是否为固定集合
+
+db.runCommand({"convertToCapped":"posts",size:10000})  将posts转化为固定集合，posts是一个集合
+
+db.cappedLogCollection.find().sort({$natural:-1})  固定集合倒序查询输出
+	
+show collections 或者 show tables
+
+db.collectionname.insert(数据)
+
+db.collectionname.find().pretty查找集合中的全部数据   pretty为美化输出，结构化输出
+
+db.collectionname.find(条件) 查找及合作指定条件的数据
+
+db.collectionname.update(文档查询的条件，需要更新的数据， {upsert：布尔，multi：布尔，writeConcern：文档})
+	upsert : 可选，这个参数的意思是，如果不存在update的记录，是否插入objNew,true为插入，默认是false，不插入。
+	multi : 可选，mongodb 默认是false,只更新找到的第一条记录，如果这个参数为true,就把按条件查出来多条记录全部更新。
+	writeConcern :可选，抛出异常的级别。
+	db.col.update({'title':'MongoDB 教程'},{$set:{'title':'MongoDB'}},{multi:true})
+
+db.collectionname.save(文档)  通过传入的文档替换已有的文档
+
+db.collectionname.remove(文档的查询条件，{ju'stOne：布尔， writeConcern: <document>})
+	justOne : （可选）如果设为 true 或 1，则只删除一个文档，如果不设置该参数，或使用默认值 false，则删除所有匹配条件的文档。
+	writeConcern :（可选）抛出异常的级别。
+
+db.collectionname.deleteOne()
+
+db.collectionname.deleteMany()
+
+db.collecttionname.find({key:val, key:val}).pretty  相当于and条件
+
+db.collectionname.find({
+		$or:[{key1:val1}, {key2:val2}]     相当于or条件
+		})
+
+db.col.find({"likes": {$gt:50}, $or: [{"by": "菜鸟教程"},{"title": "MongoDB 教程"}]}).pretty()   相当于or和and一起使用
+
+db.collectionname.find({age: {$lt: 18, $gt:12}})   条件操作符的使用
+
+db.collectionname.find({"title": {$type: "string"}})  以类型查找，查找title字段为字符串的文档
+
+db.collectionname.find().limit(number).skip(number)  查找时，限制查出几条数据，跳过前面多少个
+
+db.collectionname.find().sort({字段：1})  字段是要进行排序的字段，1为升序排列， -1为降序排列
+
+db.col.find({},{"title":1,_id:0}).sort({"likes":-1}) 	{"title":1,_id:0} 为只输出一个title字段
+
+db.collectionname.createIndex({key：1/-1})  key为要创建索引的字段，1为升序， -1为倒叙，也可以同时添加多个索引
+	db.col.createIndex({"title":1,"description":-1})
+
+db.col.getIndexes() 查看集合所有索引
+
+db.col.dropIndexes() 删除集合所有索引
+
+db.col.dropIndex("索引名称")  删除指定索引
+
+mongodb 聚合查询参考网址：https://www.cnblogs.com/zhoujie/p/mongo1.html
+
+mongodb 副本集参考文章：https://blog.csdn.net/pengjunlee/article/details/84101732
+
+mongodump -h dbhost -d dbname -o dbdirectory     数据库备份
+	-h：MongDB所在服务器地址，例如：127.0.0.1，当然也可以指定端口号：127.0.0.1:27017
+	-d：需要备份的数据库实例，例如：test
+	-o：备份的数据存放位置，例如：c:\data\dump，当然该目录需要提前建立，在备份完成后，系统自动在dump目录下建立一个test目录，这个目录里面存放该数据	      库实例的备份数据。
+
+mongorestore -h <hostname><:port> -d dbname <path>  mogodb数据恢复
+	--host <:port>, -h <:port>：MongoDB所在服务器地址，默认为： localhost:27017
+	--db , -d ：需要恢复的数据库实例，例如：test，当然这个名称也可以和备份时候的不一样，比如test2
+	--drop：恢复的时候，先删除当前数据，然后恢复备份的数据。就是说，恢复后，备份后添加修改的数据都会被删除，慎用哦！
+	<path>：mongorestore 最后的一个参数，设置备份数据所在位置，例如：c:\data\dump\test。你不能同时指定 <path> 和 --dir 选项，--dir也可以设置备份目。
+	--dir：指定备份的目录你不能同时指定 <path> 和 --dir 选项。
+
+mongodb分片操作参考文章：https://www.jianshu.com/p/cb55bb333e2d
+
+mongodb的监控：
+	mongostat是mongodb自带的状态检测工具，在命令行下使用。它会间隔固定时间获取mongodb的当前运行状态，并输出。如果你发现数据库突然变慢或者有其他		问题的话，你第一手的操作就考虑采用mongostat来查看mongo的状态。启动你的Mongod服务，进入到你安装的MongoDB目录下的bin目录， 然后输入	mongostat命令，如下所示：
+	D:\set up\mongodb\bin>mongostat
+
+	mongotop也是mongodb下的一个内置工具，mongotop提供了一个方法，用来跟踪一个MongoDB的实例，查看哪些大量的时间花费在读取和写入数据。 			mongotop提供每个集合的水平的统计数据。默认情况下，mongotop返回值的每一秒。启动你的Mongod服务，进入到你安装的MongoDB目录下的bin目录， 然后		输入mongotop命令，如下所示：
+	D:\set up\mongodb\bin>mongotop
+
+mongodb中文档间的关系：
+	一对一
+	一对多
+	多对一
+	多对多
+	{
+   	 "_id":ObjectId("52ffc33cd85242f436000001"),
+  	 "contact": "987654321",
+  	 "dob": "01-01-1991",
+  	 "name": "Tom Benzamin",
+   	 "address_ids": [
+    	  	ObjectId("52ffc4a5d85242602e000000"),
+    	 	 ObjectId("52ffc4a5d85242602e000001")
+   	   ]
+	}
+	
+	>var result = db.users.findOne({"name":"Tom Benzamin"},{"address_ids":1})   一对多关系查询，注意这一句中的 findOne 不能写成 find，因为 find 返回的数据	类型是数组，findOne 返回的数据类型是对象。
+	>var addresses = db.address.find({"_id":{"$in":result["address_ids"]}})  一对多关系查询
+
+
+mongodb的引用：
+	DBRef的形式：
+	{ $ref : , $id : , $db :  }
+	$ref：集合名称
+	$id：引用的id
+	$db:数据库名称，可选参数
+	{
+  	 "_id":ObjectId("53402597d852426020000002"),
+   	"address": {
+   		"$ref": "address_home",
+   		"$id": ObjectId("534009e4d852427820000002"),
+   		"$db": "runoob"},
+  	 "contact": "987654321",
+   	"dob": "01-01-1991",
+   	"name": "Tom Benzamin"
+	}
+	>var user = db.users.findOne({"name":"Tom Benzamin"})   引用的查询
+	>var dbRef = user.address
+	>db[dbRef.$ref].findOne({"_id":(dbRef.$id)})   //>db[dbRef.$ref].findOne({"_id":ObjectId(dbRef.$id)}) mongodb4.0的写法
+
+mogodb的查询分析：
+	MongoDB 查询分析常用函数有：explain() 和 hint()。
+	db.users.find({gender:"M"},{user_name:1,_id:0}).explain()
+	db.users.find({gender:"M"},{user_name:1,_id:0}).hint({gender:1,user_name:1})  使用hint来强制使用一个指定的索引
+	db.users.find({gender:"M"},{user_name:1,_id:0}).hint({gender:1,user_name:1}).explain()
+
+
+mogodb的原子操作，待了解
+
+
+db.users.ensureIndex({"address.city":1,"address.state":1,"address.pincode":1})  可以为文档的子文档也添加索引
+
+mongodb map reduce 还需继续了解
+
+>db.posts.ensureIndex({post_text:"text"}) 创建全文检索   "text"
+db.posts.find({$text:{$search:"runoob"}})  全文检索查询
+
+db.posts.find({post_text:{$regex:"runoob",$options:"$i"}}) 使用正则表达式查询文档，$options:"$i"并且不区分大小写
+
+mongodb管理工具 RockMongo，下载地址：https://github.com/iwind/rockmongo
+	             Navicat for MongoDB 下载地址：https://www.navicat.com.cn/products
+
+
+mongodb存储文件：
+	现在我们使用 GridFS 的 put 命令来存储 mp3 文件。 调用 MongoDB 安装目录下bin的 mongofiles.exe工具。
+	打开命令提示符，进入到MongoDB的安装目录的bin目录中，找到mongofiles.exe，并输入下面的代码：
+	mongofiles.exe -d gridfs put song.mp4  gridfs是数据库名称，如果没有将会自动创建
+	db.fs.files.find()  查找文件
+
+
+
+	
+
+
+
+
